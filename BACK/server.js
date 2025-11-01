@@ -1,11 +1,13 @@
 const express = require("express");
 const authRoutes = require("./routes/auth.routes");
-const cors = require('cors');
+const preguntasRoutes = require("./routes/preguntas.routes");
+const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares mínimos
 app.use(express.json());
+// app.use(cors());
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5500',
@@ -29,10 +31,10 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Para conectar las preguntas
-const questionsRoutes = require("./routes/preguntas.routes");
+
 // Montar rutas bajo /api
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/preguntas", preguntasRoutes);
 
 // Para verificar que el servidor responde
 app.get("/", (req, res) => {
@@ -43,3 +45,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
+
+module.exports = app;
