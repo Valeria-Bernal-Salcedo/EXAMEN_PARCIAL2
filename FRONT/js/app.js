@@ -37,7 +37,7 @@ form.addEventListener("submit", async (e) => {
 
   // Enviar los datos al servidor usando fetch + async/await
   try {
-    const res = await fetch("http://localhost:3000/api/login", {
+    const res = await fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -111,7 +111,7 @@ function updateUILoggedOut() {
 // --- Función para hacer logout ---
 async function logout() {
   try {
-    const res = await fetch("http://localhost:3000/api/logout", {
+    const res = await fetch("http://localhost:3000/api/auth/logout", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem('token')}`

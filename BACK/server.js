@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares mínimos
 app.use(express.json());
-// app.use(cors());
 
 const ALLOWED_ORIGINS = [
   'http://localhost:5500',
@@ -35,11 +34,6 @@ app.use(cors({
 // Montar rutas bajo /api
 app.use("/api/auth", authRoutes);
 app.use("/api/preguntas", preguntasRoutes);
-
-// Para verificar que el servidor responde
-app.get("/", (req, res) => {
-    res.send("✅ Servidor Node.js funcionando correctamente");
-});
 
 // Levantar servidor
 app.listen(PORT, () => {
