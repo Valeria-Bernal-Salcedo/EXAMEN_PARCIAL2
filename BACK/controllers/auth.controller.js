@@ -2,7 +2,7 @@
 
 const users = require("../data/users.json");
 const { createSession, deleteSession } = require("../middleware/auth.middleware");
-
+ 
 // Función controladora para manejar el login
 exports.login = (req, res) => { 
   // Extrae 'cuenta' del body de la petición (protección contra body undefined)

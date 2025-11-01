@@ -1,8 +1,8 @@
 /* API RUTAS */
-
 const express = require("express");
 const { login, logout, getProfile } = require("../controllers/auth.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
+const { startQuiz, submitAnswers } = require("../controllers/preguntas.controller");
 
 const router = express.Router();
 
@@ -15,5 +15,6 @@ router.post("/logout", verifyToken, logout);
 
 // GET /api/profile - Obtener perfil del usuario autenticado
 router.get("/profile", verifyToken, getProfile);
+
 
 module.exports = router;

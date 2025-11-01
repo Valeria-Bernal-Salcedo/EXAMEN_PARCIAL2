@@ -1,6 +1,6 @@
 module.exports = [
-    {
-        id: 1,
+    { 
+        "id": 1,
         text: "¿Cuál es la etiqueta correcta para declarar el documento HTML5?",
         options: ["<html5>", "<!DOCTYPE html>", "<doctype html5>", "<!HTML>"],
         correct: "<!DOCTYPE html>"

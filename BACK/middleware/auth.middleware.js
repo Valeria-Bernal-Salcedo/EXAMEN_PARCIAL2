@@ -79,4 +79,6 @@ exports.clearAllSessions = () => {
   sessions.clear();
 };
 
+exports.sessions = sessions;
+
 

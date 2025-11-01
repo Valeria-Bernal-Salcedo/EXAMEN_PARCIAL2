@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { startQuiz, submitAnswers } = require("../controllers/preguntas.controller");
+const { verifyToken } = require("../middleware/auth.middleware");
 
-// POST que envía preguntas
-router.post("/start", startQuiz);
+// POST /api/start - envía preguntas
+router.post("/start", verifyToken, startQuiz);
 
-// POST que recibe y evalúa respuestas
-router.post("/submit", submitAnswers);
+// POST /api/submit - recibe y evalúa respuestas
+router.post("/submit", verifyToken, submitAnswers);
 
 module.exports = router;
