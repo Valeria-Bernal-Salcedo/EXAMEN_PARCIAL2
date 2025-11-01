@@ -134,3 +134,17 @@ async function logout() {
     updateUILoggedOut();
   }
 }
+
+document.getElementById('formContacto').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  Swal.fire({
+    icon: 'success',
+    title: '¡Mensaje enviado!',
+    text: 'Tu información ha sido enviada correctamente.',
+    confirmButtonText: 'Aceptar',
+    confirmButtonColor: '#0f45c5'
+  });
+
+  this.reset();
+});
