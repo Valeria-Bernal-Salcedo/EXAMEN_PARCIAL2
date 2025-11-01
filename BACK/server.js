@@ -29,10 +29,15 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-
+// Para conectar las preguntas
+const questionsRoutes = require("./routes/preguntas.routes");
 // Montar rutas bajo /api
 app.use("/api", authRoutes);
 
+// Para verificar que el servidor responde
+app.get("/", (req, res) => {
+    res.send("✅ Servidor Node.js funcionando correctamente");
+});
 
 // Levantar servidor
 app.listen(PORT, () => {
