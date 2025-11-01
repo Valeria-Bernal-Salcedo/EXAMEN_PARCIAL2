@@ -2,7 +2,7 @@ const QUESTIONS = require("../data/preguntas");
 
 const startQuiz = (req, res) => {
   const name = req.body && req.body.name ? req.body.name : "PONER OTRO NOMBRE";
-  console.log(`Acceso al /api/start  ${name}`);
+  console.log(`Acceso al /api/preguntas/start  ${name}`);
   console.log("Request body (start):", JSON.stringify(req.body, null, 2));
 
   // Crea una copia de todas las preguntas SIN el campo 'correct'
@@ -23,7 +23,7 @@ const startQuiz = (req, res) => {
 const submitAnswers = (req, res) => {
   const name = req.body && req.body.name ? req.body.name : "PONER OTRO NOMBRE";
 
-  console.log(`Acceso al /api/submit y ${name}`);
+  console.log(`Acceso al /api/preguntas/submit y ${name}`);
   console.log("Request body (submit) recibido del front (JSON con respuestas):", JSON.stringify(req.body, null, 2));
 
   const userAnswers = Array.isArray(req.body.answers) ? req.body.answers : [];
@@ -56,4 +56,9 @@ const submitAnswers = (req, res) => {
   console.log("Respuesta del servidor (submit):", JSON.stringify(responseBody, null, 2));
 
   return res.status(200).json(responseBody);
+};
+
+module.exports = {
+  startQuiz,
+  submitAnswers
 };
