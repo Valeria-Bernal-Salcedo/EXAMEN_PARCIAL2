@@ -1,3 +1,46 @@
+// -------------------- Inicialización general --------------------
+document.addEventListener('DOMContentLoaded', function() {
+  // UI state inicial
+  const token = safeToken();
+  const userName = localStorage.getItem('userName');
+  if (token && userName) updateUILoggedIn(userName);
+  else updateUILoggedOut();
+
+  // Abrir modal login
+  const loginBtn = document.getElementById('loginBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeModal = document.getElementById('closeModal');
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (loginBtn && loginModal) loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
+  if (closeModal && loginModal) closeModal.addEventListener('click', () => loginModal.style.display = 'none');
+  window.addEventListener('click', (e) => { if (loginModal && e.target === loginModal) loginModal.style.display = 'none'; });
+  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+  // Form login
+  const form = document.getElementById('formLogin');
+  if (form) form.addEventListener('submit', handleLoginSubmit);
+  else console.warn('#formLogin no encontrado');
+
+  // Botón cargar preguntas (si existe)
+  const btn = document.getElementById('btnCargar');
+  if (btn) btn.addEventListener('click', cargarPreguntas);
+
+  // Botón enviar respuestas (main submit o id fallback)
+  const sbtn = document.querySelector('main button[type="submit"], #submitAnswers');
+  if (sbtn) sbtn.addEventListener('click', enviarRespuestas);
+
+  // Inicializar tarjetas
+  iniciarExamenCards();
+
+  // ---- detectar cert por querystring y auto-cargar en examen.html ----
+  const certFromUrl = getQueryParam('cert');
+  if (certFromUrl) {
+    CERT_NAME = certFromUrl;
+    console.log('CERT_NAME seteado desde URL:', CERT_NAME);
+  }
+
+});
+
 // app.js - Consolidado y listo para redirigir a examen.html?cert=... y auto-cargar preguntas
 const API_BASE = 'http://localhost:3000/api/preguntas';
 const AUTH_BASE = 'http://localhost:3000/api/auth';
@@ -21,6 +64,18 @@ function getQueryParam(name) {
     return null;
   }
 }
+
+// Manejo de alerts
+function mostrarAlerta(titulo, mensaje, tipo) {
+  Swal.fire({
+    title: titulo,
+    text: mensaje,
+    icon: tipo,
+    confirmButtonText: 'Aceptar',
+    confirmButtonColor: '#3085d6'
+  });
+}
+
 
 function sanitizeKey(name) {
   return String(name)
@@ -93,7 +148,7 @@ async function handleLoginSubmit(event) {
   const login = loginInput ? loginInput.value.trim() : '';
   const contrasena = passInput ? passInput.value : '';
 
-  if (!login || !contrasena) { alert('Introduce usuario y contraseña'); return; }
+  if (!login || !contrasena) { mostrarAlerta('Campos vacíos', 'Introduce usuario y contraseña','warning'); return; }
 
   try {
     const res = await fetch(`${AUTH_BASE}/login`, {
@@ -109,14 +164,14 @@ async function handleLoginSubmit(event) {
     console.log('LOGIN response:', res.status, data, text);
 
     if (!res.ok) {
-      alert(data?.error ?? data?.message ?? `Error ${res.status} al iniciar sesión`);
+      mostrarAlerta('Error', data?.error ?? data?.message ?? `Error ${res.status} al inciar sesión`, 'error');
       if (loginInput) loginInput.value = '';
       if (passInput) passInput.value = '';
       return;
     }
 
     if (!data.token) {
-      alert('Inicio de sesión correcto pero el servidor no devolvió token. Revisa backend.');
+      mostrarAlerta('Error', 'Inicio de sesión correcto pero el servidor no devolvió token. Revisa backend.', 'error');
       console.error('LOGIN sin token:', data);
       return;
     }
@@ -125,7 +180,7 @@ async function handleLoginSubmit(event) {
     const cuenta = data.usuario?.cuenta ?? login;
     localStorage.setItem('userName', cuenta);
 
-    alert('Acceso permitido: ' + cuenta);
+    mostrarAlerta('Acceso permitido', `Bienvenid@, ${cuenta}`, 'success');
     updateUILoggedIn(cuenta);
 
     const loginModal = document.getElementById('loginModal');
@@ -134,7 +189,7 @@ async function handleLoginSubmit(event) {
     if (passInput) passInput.value = '';
   } catch (err) {
     console.error('Error de conexión al login:', err);
-    alert('Error de conexión con el servidor. Revisa la consola.');
+    mostrarAlerta('Error de conexión', 'No se pudo conectar con el servidor. Revisa la consola.', 'error');
   }
 }
 
@@ -146,15 +201,15 @@ async function logout() {
       headers: { 'Authorization': `Bearer ${token || ''}` }
     });
 
-    if (res.ok) { alert('Sesión cerrada correctamente'); }
+    if (res.ok) { mostrarAlerta('Sesión cerrada', 'Has cerrado sesión correctamente.', 'success');  }
     else {
       let data = {};
       try { data = await res.json(); } catch (e) {}
-      alert(data?.error ?? 'Error al cerrar sesión en el servidor');
+      mostrarAlerta('Error', data?.error ?? 'Error al cerrar sesión en el servidor', 'error');
     }
   } catch (err) {
     console.error('Error al conectar con el servidor al hacer logout:', err);
-    alert('Error de conexión (no se pudo notificar logout al servidor)');
+    mostrarAlerta('Error', 'Error de conexión (no se pudo notificar logout al servidor)', 'error' );
   } finally {
     clearLocalSession();
     updateUILoggedOut();
@@ -170,12 +225,28 @@ const resultContainer = () => document.getElementById('resultContainer');
 
 async function cargarPreguntas() {
   const btn = btnCargar();
-  if (!isLoggedIn()) { alert('Debes iniciar sesión.'); openLoginModal(); return; }
+  if (!isLoggedIn()) { mostrarAlerta('Acceso denegado', 'Debes iniciar sesión.', 'warning'); openLoginModal(); return; }
+  if(localStorage.getItem('examCompleted')){
+    mostrarAlerta('Examen realizado', 'El examen solo puede realizarse una vez', 'info');
+    return;
+  }
+
   if (!isPaid(CERT_NAME)) {
-    alert('Debes pagar el examen antes de iniciar.');
-    const ok = confirm('¿Deseas simular el pago ahora para pruebas?');
-    if (!ok) return;
-    setPaid(CERT_NAME, true);
+    Swal.fire({
+      title: 'Pago requerido',
+      text: 'Debes pagar el examen antes de iniciar.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Pagar ahora',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then(result => {
+      if (result.isConfirmed) {
+        mostrarAlerta('Pagado', 'Pago realizado exitosamente', 'success');
+        setPaid(CERT_NAME, true);
+      }
+    });
   }
 
   if (btn) { btn.disabled = true; btn.textContent = 'Cargando preguntas...'; }
@@ -198,7 +269,7 @@ async function cargarPreguntas() {
     try { data = text ? JSON.parse(text) : {}; } catch (e) { data = {}; }
 
     if (!res.ok) {
-      alert(data.message ?? data.error ?? `Error ${res.status} al solicitar preguntas.`);
+      mostrarAlerta('Error', data.message ?? data.error ?? `Error ${res.status} al solicitar preguntas.`, 'error');
       if (btn) { btn.disabled = false; btn.textContent = 'Iniciar examen'; }
       return;
     }
@@ -215,12 +286,12 @@ async function cargarPreguntas() {
     if (preguntas.length === 0) {
       container.innerHTML = '<p>No se encontraron preguntas para esta certificación.</p>';
     } else {
-      preguntas.forEach(q => {
+      preguntas.forEach((q,index) => {
         const idStr = typeof q.id === 'number' ? q.id : Number(q.id);
         const opts = q.options ?? q.choices ?? [];
         const html = `
           <div class="card">
-            <p><strong>${escapeHtml(String(idStr))}.</strong> ${escapeHtml(q.text ?? q.question ?? '')}</p>
+            <p><strong>${index + 1}.</strong> ${escapeHtml(q.text ?? q.question ?? '')}</p>
             ${opts.map(opt => `
               <label>
                 <input type="radio" name="q_${escapeHtml(String(idStr))}" value="${escapeHtml(String(opt))}"> ${escapeHtml(String(opt))}
@@ -237,14 +308,14 @@ async function cargarPreguntas() {
     if (btn) { btn.textContent = 'Preguntas cargadas'; btn.disabled = true; }
   } catch (err) {
     console.error('Error al pedir preguntas:', err);
-    alert('Error al cargar preguntas. Revisa la consola.');
+    mostrarAlerta('Error', 'Error al cargar preguntas. Revisa la consola.', 'error');
     if (btn) { btn.disabled = false; btn.textContent = 'Iniciar examen'; }
   }
 }
 
 async function enviarRespuestas(e) {
   e.preventDefault();
-  if (!preguntas || preguntas.length === 0) { alert('No hay preguntas cargadas.'); return; }
+  if (!preguntas || preguntas.length === 0) {  mostrarAlerta('Sin preguntas', 'No hay preguntas cargadas.', 'warning'); return; }
 
   const answers = preguntas.map(q => {
     const idNum = (typeof q.id === 'number') ? q.id : Number(q.id);
@@ -278,6 +349,9 @@ async function enviarRespuestas(e) {
     const score = body.score;
     const total = body.total;
     const details = Array.isArray(body.details) ? body.details : [];
+   
+    localStorage.setItem('examCompleted','true');
+    mostrarAlerta('¡Examen enviado!', 'Tus respuestas fueron registradas.', 'success');
 
     if (typeof score !== 'undefined' && typeof total !== 'undefined' && total != 0) {
       const avg = (Number(score) / Number(total)) * 100;
@@ -303,7 +377,7 @@ async function enviarRespuestas(e) {
     if (sbtn) { sbtn.textContent = 'Enviar respuestas'; sbtn.disabled = true; }
   } catch (err) {
     console.error('Error submit:', err);
-    alert('Error al enviar respuestas. Revisa la consola.');
+    mostrarAlerta('Error', 'No se pudieron enviar las respuestas. Revisa la consola.', 'error');
     if (sbtn) { sbtn.disabled = false; sbtn.textContent = 'Enviar respuestas'; }
   }
 }
@@ -322,33 +396,46 @@ function iniciarExamenCards() {
     if (!empezar) return;
 
     empezar.addEventListener('click', () => {
-      if (!isLoggedIn()) { alert('No puedes hacer el examen: debes iniciar sesión.'); openLoginModal(); return; }
+      if(empezar.id !== 'examen-activo'){
+        mostrarAlerta('No disponible', 'Este examen no está disponible actualmente.', 'info');
+        return;
+      }
+ 
+      if (!isLoggedIn()) {mostrarAlerta('Acceso restringido', 'Debes iniciar sesión para realizar el examen.', 'warning');
+                 openLoginModal(); return; }
 
       if (!isPaid(certName)) {
-        alert('No puedes hacer el examen porque no has pagado.');
-        const pagarAhora = confirm('¿Deseas pagar el examen ahora?');
-        if (pagarAhora) {
-          setPaid(certName, true);
-          alert('Pago realizado correctamente. Abriendo la página del examen...');
-          // si estamos ya en examen.html, cargamos localmente; si no, redirigimos
-          const current = window.location.pathname.split('/').pop();
-          if (current === 'examen.html') {
-            CERT_NAME = certName;
-            cargarPreguntas();
-            return;
+        Swal.fire({
+          title: 'Pago requerido',
+          text: 'No puedes hacer el examen porque no has pagado.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Pagar ahora',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33'
+        }).then(result => {
+          if (result.isConfirmed) {
+            setPaid(certName, true);
+            mostrarAlerta('Pago completado', 'Pago realizado correctamente. Abriendo el examen...', 'success');
+            const current = window.location.pathname.split('/').pop();
+            if (current === 'examen.html') {
+              CERT_NAME = certName;
+              cargarPreguntas();
+              return;
+            }
+            gotoExamPage(certName);
+          } else {
+            mostrarAlerta('Cancelado', 'No puedes iniciar el examen sin pagar.', 'info');
           }
-          gotoExamPage(certName);
-        } else {
-          alert('No puedes iniciar el examen sin pagar.');
-        }
-        return;
+        });
       }
 
       // si está logueado y pagado => redirigir o cargar si ya en examen.html
       const current = window.location.pathname.split('/').pop();
       if (current === 'examen.html') {
         CERT_NAME = certName;
-        cargarPreguntas();
+        //cargarPreguntas();
       } else {
         gotoExamPage(certName);
       }
@@ -356,51 +443,4 @@ function iniciarExamenCards() {
   });
 }
 
-// -------------------- Inicialización general --------------------
-document.addEventListener('DOMContentLoaded', function() {
-  // UI state inicial
-  const token = safeToken();
-  const userName = localStorage.getItem('userName');
-  if (token && userName) updateUILoggedIn(userName);
-  else updateUILoggedOut();
 
-  // Abrir modal login
-  const loginBtn = document.getElementById('loginBtn');
-  const loginModal = document.getElementById('loginModal');
-  const closeModal = document.getElementById('closeModal');
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (loginBtn && loginModal) loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
-  if (closeModal && loginModal) closeModal.addEventListener('click', () => loginModal.style.display = 'none');
-  window.addEventListener('click', (e) => { if (loginModal && e.target === loginModal) loginModal.style.display = 'none'; });
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
-
-  // Form login
-  const form = document.getElementById('formLogin');
-  if (form) form.addEventListener('submit', handleLoginSubmit);
-  else console.warn('#formLogin no encontrado');
-
-  // Botón cargar preguntas (si existe)
-  const btn = document.getElementById('btnCargar');
-  if (btn) btn.addEventListener('click', cargarPreguntas);
-
-  // Botón enviar respuestas (main submit o id fallback)
-  const sbtn = document.querySelector('main button[type="submit"], #submitAnswers');
-  if (sbtn) sbtn.addEventListener('click', enviarRespuestas);
-
-  // Inicializar tarjetas
-  iniciarExamenCards();
-
-  // ---- detectar cert por querystring y auto-cargar en examen.html ----
-  const certFromUrl = getQueryParam('cert');
-  if (certFromUrl) {
-    CERT_NAME = certFromUrl;
-    console.log('CERT_NAME seteado desde URL:', CERT_NAME);
-  }
-
-  // Si estamos en examen.html, intentar cargar preguntas automáticamente
-  const pathname = window.location.pathname.split('/').pop();
-  if (pathname === 'examen.html') {
-    // cargarPreguntas() validará login/pago y abrirá modal si hace falta
-    cargarPreguntas();
-  }
-});

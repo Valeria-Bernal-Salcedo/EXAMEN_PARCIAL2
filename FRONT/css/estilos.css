@@ -100,7 +100,7 @@ body {
 main {
   width: 99%;
   margin: 0;
-  padding: 0;
+  padding: 5rem 1rem 4rem;
   box-sizing: border-box;
 }
 
@@ -414,6 +414,7 @@ footer {
   background-color: #656cad;
   padding: 10px 30px;
   border-radius: 30px;
+  cursor: pointer;
 }
 
 /* Pone en negritas la ultima p de cada card */
@@ -423,6 +424,8 @@ footer {
   margin-top: 0.5rem;
 } */
 
+
+/* PÁGINA CONTACTO */
 .contacto-intro {
   background: #ffffff;
   text-align: center;
@@ -494,6 +497,8 @@ footer {
   background: #3a6eff;
 }
 
+
+/* PAGINA NOSOTROS */
 .nosotros-intro {
   /* background: #ffffff; */
   text-align: center;
@@ -580,7 +585,7 @@ footer {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 260px;
-  height: 200px;
+  height: auto;
   padding: 1.5rem;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -618,4 +623,148 @@ footer {
   color: white;
   padding: 3rem 1rem;
   border-radius: 10px;
+}
+
+
+/* EXAMEN */
+/* Contenedor principal de preguntas */
+#questionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tarjeta de pregunta */
+#questionsContainer .card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 1.8rem;
+  width: 100%;
+  align-self: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#questionsContainer .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+#questionsContainer .card p {
+  font-weight: 500;
+  color: #002078;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+#questionsContainer label {
+  display: block;
+  background: #f0f3ff;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #333;
+  font-size: 0.98rem;
+}
+
+#questionsContainer input[type="radio"] {
+  margin-right: 8px;
+  accent-color: #0020a0; /* color del radio */
+}
+
+#questionsContainer label:hover {
+  background: #e3e8ff;
+}
+
+/* Botón de iniciar examen */
+#btnCargar {
+  display: block;
+  background: #0020a0;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  margin: 0 auto;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+#btnCargar:hover {
+  background: #0040ff;
+  transform: scale(1.05);
+}
+
+/* Botón de enviar respuestas */
+#submitAnswers {
+  display: block;
+  background: #0020a0;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  margin: 2rem auto;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+#submitAnswers:hover:enabled {
+  background: #0040ff;
+  transform: scale(1.05);
+}
+
+#submitAnswers:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Resultados */
+#resultContainer {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  text-align: center;
+}
+
+#resultContainer h2 {
+  color: #0020a0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+#resultContainer .card {
+  text-align: left;
+  color: #383838;
+  width: 95%;
+  background: #f8faff;
+  border-left: 5px solid #0020a0;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+#resultContainer .card p {
+  margin: 0.4rem 0;
+}
+
+#resultContainer .ok {
+  color: #00923f;
+  font-weight: bold;
+}
+
+#resultContainer .bad {
+  color: #e00000;
+  font-weight: bold;
 }
