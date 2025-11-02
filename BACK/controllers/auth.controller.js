@@ -36,7 +36,8 @@ exports.login = (req, res) => {
   return res.status(200).json({
     mensaje: "Acceso permitido",
     usuario: { cuenta: match.cuenta }, // Devuelve solo la cuenta, NO la contraseña
-    token: token // Token de sesión para usar en peticiones protegidas
+    token: token, // Token de sesión para usar en peticiones protegidas
+    nombre: match.nombre
   });
 };
  
