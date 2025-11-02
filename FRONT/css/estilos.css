@@ -22,12 +22,14 @@ body {
   background: rgb(0, 0, 148);
   color: #fff;
   padding: 0.5rem 1.5rem;
+  position: fixed;
+  width: 98%;
 }
 
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 3rem;
 }
 
 .nav-logo {
@@ -96,7 +98,7 @@ body {
 
 /* ===MAIN GLOBAL=== */
 main {
-  width: 100%;
+  width: 99%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -174,13 +176,15 @@ main {
 /* ===FOOTER=== */
 footer {
   position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   bottom: 0;
-  left: 0;
   width: 100%;
   background: rgb(0, 0, 148);;
   color: #fff;
-  text-align: center;
   padding: 1rem 0;
+  height: 2rem;
 }
 
 /* ===PÁGINA PRINCIPAL=== */
@@ -299,16 +303,20 @@ footer {
 }
 
 .certificaciones-intro {
-  width: 100%;
-  background: #ffffff;
-  text-align: center;
+  width: 99.4%;
+  background: #fff;
+  text-align: center; 
   padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .certificaciones-intro h1 {
   font-size: 2.5rem;
   color: #0f45c5;
-  margin-bottom: 0.5rem;
+  margin-bottom: 2rem;
+  margin-top: 1em;
 }
 
 .certificaciones-intro h2 {
@@ -319,21 +327,20 @@ footer {
 
 .certificaciones-intro p {
   max-width: 700px;
-  margin: 0 auto;
+  /* margin-bottom: 1rem; */
   color: #555;
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
 .certificaciones-list {
-  width: 100%;
-  background: #f4f6fb;
+  width: 97.5%;
+  background: #fff;
   padding: 4rem 2rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 2.5rem;
-  box-sizing: border-box;
+  gap: 3rem;
 }
 
 .certificacion-card {
@@ -341,13 +348,15 @@ footer {
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem 1.5rem;
-  width: 280px;
+  width: 350px;
+  height: 740px;
   color: #fff;
   text-align: left;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 3rem;
 }
 
 .certificacion-card:hover {
@@ -360,13 +369,14 @@ footer {
   margin-bottom: 1rem;
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
   padding-bottom: 0.5rem;
+  text-align: center;
 }
 
 .certificacion-card p {
   font-size: 0.95rem;
   line-height: 1.5;
   color: #eef1ff;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
 }
 
 .certificacion-card ul {
@@ -389,11 +399,29 @@ footer {
   font-size: 1rem;
 }
 
-.certificacion-card p:last-of-type {
+.botones{
+  display: flex;
+  justify-content: space-around;
+}
+
+.empezar, .pagoExamen{
+  background-color: #858ee1;
+  padding: 10px 30px;
+  border-radius: 30px;
+}
+
+.empezar:hover, .pagoExamen:hover{
+  background-color: #656cad;
+  padding: 10px 30px;
+  border-radius: 30px;
+}
+
+/* Pone en negritas la ultima p de cada card */
+/* .certificacion-card p:last-of-type {
   font-weight: bold;
   color: #fff;
   margin-top: 0.5rem;
-}
+} */
 
 .contacto-intro {
   background: #ffffff;
@@ -413,6 +441,7 @@ footer {
   font-size: 1.5rem;
   color: #222;
   margin-bottom: 1rem;
+  margin-top: 3rem;
 }
 
 .contacto-intro p {
@@ -466,10 +495,10 @@ footer {
 }
 
 .nosotros-intro {
-  background: #ffffff;
+  /* background: #ffffff; */
   text-align: center;
   padding: 4rem 1rem;
-  width: 100%;
+  width: 99vw;
   box-sizing: border-box;
 }
 
@@ -497,7 +526,7 @@ footer {
   background: #f7f7f7;
   text-align: center;
   padding: 3.5rem 1rem;
-  width: 100%;
+  width: 99vw;
   box-sizing: border-box;
 }
 
@@ -519,6 +548,11 @@ footer {
   background: #f7f7f7;
   text-align: center;
   padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* height: 500px; */
 }
 
 .nosotros-equipo h2 {
@@ -529,8 +563,8 @@ footer {
 
 .nosotros-equipo p {
   max-width: 800px;
-  margin: 0 auto 2rem;
   color: #555;
+  margin-bottom: 2rem;
 }
 
 .equipo-cards {
@@ -538,6 +572,7 @@ footer {
   justify-content: center;
   flex-wrap: wrap;
   gap: 2rem;
+  height: 300px;
 }
 
 .equipo-card {
@@ -545,6 +580,7 @@ footer {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 260px;
+  height: 200px;
   padding: 1.5rem;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
