@@ -61,7 +61,7 @@ body {
 }
 
 .nav-link:hover {
-  background: #444;
+  background: #7a7dcd;
 }
 
 .nav-link {
@@ -70,10 +70,6 @@ body {
   padding: 0.3rem 0.7rem;
   border-radius: 3px;
   transition: background 0.2s;
-}
-
-.nav-link:hover {
-  background: #444;
 }
 
 .nav-right {
@@ -93,7 +89,7 @@ body {
 }
 
 .icon-btn:hover {
-  background: #444;
+  background: #7a7dcd;
 }
 
 /* ===MAIN GLOBAL=== */

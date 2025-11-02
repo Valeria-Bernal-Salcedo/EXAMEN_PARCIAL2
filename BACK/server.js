@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/auth.routes");
 const preguntasRoutes = require("./routes/preguntas.routes");
+const contactoRoutes = require("./routes/contacto.routes");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,8 @@ app.use(cors({
 // Montar rutas bajo /api
 app.use("/api/auth", authRoutes);
 app.use("/api/preguntas", preguntasRoutes);
+app.use("/api/contacto", contactoRoutes);
+
 
 // Levantar servidor
 app.listen(PORT, () => {

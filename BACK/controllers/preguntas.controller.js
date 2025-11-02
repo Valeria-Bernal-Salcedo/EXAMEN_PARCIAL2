@@ -1,6 +1,8 @@
 const QUESTIONS = require("../data/preguntas");
 const { sessions } = require("../middleware/auth.middleware");
 
+const PDFDocument = require("pdfkit");
+
 // Guardar que usuarios ya hicieron el examen
 const usuarioExamen = new Map();
 
@@ -104,7 +106,45 @@ const submitAnswers = (req, res) => {
   return res.status(200).json(responseBody);
 };
 
+function generarCertificado(req, res) {
+  const userId = req.userId;
+  let { cert, score, total, nombre } = req.body;
+
+  nombre = typeof nombre === 'string' ? nombre : JSON.stringify(nombre || 'Usuario');
+  score = Number(score) || 0;
+  total = Number(total) || 0;
+
+  const aprobado = Number(score) >= 7;
+
+  if (!aprobado) {
+    return res.status(400).json({ message: 'No puedes generar un certificado sin aprobar el examen.' });
+  }
+
+  const doc = new PDFDocument({
+    size: 'A4',
+    margin: 50
+  });
+
+  res.setHeader('Content-Disposition', `attachment; filename=Certificado_${nombre}.pdf`);
+  res.setHeader('Content-Type', 'application/pdf');
+
+  doc.pipe(res);
+
+  doc.fontSize(24).text('CERTIFICADO DE APROBACIÓN', { align: 'center' });
+  doc.moveDown(2);
+  doc.fontSize(18).text(`Otorgado a: ${nombre}`, { align: 'center' });
+  doc.moveDown(1);
+  doc.fontSize(16).text(`Puntaje obtenido: ${score}/${total}`, { align: 'center' });
+  doc.moveDown(1);
+  doc.text('Por haber aprobado exitosamente el examen de certificación.', { align: 'center' });
+  doc.moveDown(2);
+  doc.fontSize(12).text(`Fecha: ${new Date().toLocaleDateString()}`, { align: 'center' });
+
+  doc.end();
+}
+
 module.exports = {
   startQuiz,
-  submitAnswers
+  submitAnswers,
+  generarCertificado
 };

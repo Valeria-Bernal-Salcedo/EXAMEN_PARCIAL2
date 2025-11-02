@@ -26,8 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
   if (btn) btn.addEventListener('click', cargarPreguntas);
 
   // Botón enviar respuestas (main submit o id fallback)
-  const sbtn = document.querySelector('main button[type="submit"], #submitAnswers');
+  const sbtn = document.querySelector('#submitAnswers');
   if (sbtn) sbtn.addEventListener('click', enviarRespuestas);
+
+  // Boton enviar formulario de contacto
+  const btnContacto = document.querySelector('#btnFormContacto');
+  if (btnContacto) btnContacto.addEventListener('click', enviarFormulario);
 
   // Inicializar tarjetas
   iniciarExamenCards();
@@ -179,6 +183,8 @@ async function handleLoginSubmit(event) {
     localStorage.setItem('token', data.token);
     const cuenta = data.usuario?.cuenta ?? login;
     localStorage.setItem('userName', cuenta);
+    const nombreCompleto = data.nombre ?? login;
+    localStorage.setItem('nombre', nombreCompleto);
 
     mostrarAlerta('Acceso permitido', `Bienvenid@, ${cuenta}`, 'success');
     updateUILoggedIn(cuenta);
@@ -226,6 +232,9 @@ const resultContainer = () => document.getElementById('resultContainer');
 async function cargarPreguntas() {
   const btn = btnCargar();
   if (!isLoggedIn()) { mostrarAlerta('Acceso denegado', 'Debes iniciar sesión.', 'warning'); openLoginModal(); return; }
+  
+  const currentUser = localStorage.getItem('userName') || 'anon';
+  const completedKey = `examCompleted_${sanitizeKey(currentUser)}_${sanitizeKey(CERT_NAME)}`;
   if(localStorage.getItem('examCompleted')){
     mostrarAlerta('Examen realizado', 'El examen solo puede realizarse una vez', 'info');
     return;
@@ -350,7 +359,9 @@ async function enviarRespuestas(e) {
     const total = body.total;
     const details = Array.isArray(body.details) ? body.details : [];
    
-    localStorage.setItem('examCompleted','true');
+    const currentUser = localStorage.getItem('userName') || 'anon';
+    const key = `examCompleted_${sanitizeKey(currentUser)}_${sanitizeKey(CERT_NAME)}`;
+    localStorage.setItem(key, 'true');
     mostrarAlerta('¡Examen enviado!', 'Tus respuestas fueron registradas.', 'success');
 
     if (typeof score !== 'undefined' && typeof total !== 'undefined' && total != 0) {
@@ -372,6 +383,58 @@ async function enviarRespuestas(e) {
           </div>
         `).join('')}
       `;
+    }
+
+    if(Number(score)>=7){
+      const btnDescargar = document.createElement('button');
+      btnDescargar.textContent = 'Descargar certificado';
+      btnDescargar.classList.add('btn-certificado');
+      btnDescargar.addEventListener('click', async () => {
+        const userName = localStorage.getItem('nombre') || 'Usuario';
+        const token = safeToken();
+        try {
+          const res = await fetch(`http://localhost:3000/api/preguntas/certificado`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              cert: CERT_NAME,
+              score,
+              total,
+              nombre: userName
+            })
+          });
+
+          if (!res.ok) {
+            const data = await res.json();
+            mostrarAlerta('Error', data?.message || 'No se pudo generar el certificado.', 'error');
+            return;
+          }
+
+          // Descargar PDF directamente
+          const blob = await res.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Certificado_${CERT_NAME}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+
+        } catch (err) {
+          console.error('Error al descargar certificado:', err);
+          mostrarAlerta('Error', 'No se pudo conectar con el servidor.', 'error');
+        }
+      });
+
+      rCont.appendChild(btnDescargar);
+    } else {
+      rCont.insertAdjacentHTML('beforeend', `
+        <p class="bad">No alcanzaste la calificación mínima para obtener el certificado (7/8).</p>
+      `);
     }
 
     if (sbtn) { sbtn.textContent = 'Enviar respuestas'; sbtn.disabled = true; }
@@ -443,4 +506,45 @@ function iniciarExamenCards() {
   });
 }
 
+/* FORMULARIO CONTACTO */
+async function enviarFormulario(e) {
+  e.preventDefault();
+  console.log("Formuario enviado");
+  // Capturar los valores del formulario
+  const nombre = document.getElementById('nombre')?.value.trim();
+  const correo = document.getElementById('email')?.value.trim();
+  const mensaje = document.getElementById('mensaje')?.value.trim();
 
+  if (!nombre || !correo || !mensaje) {
+    mostrarAlerta('Campos incompletos', 'Por favor llena todos los campos antes de enviar.', 'warning');
+    return;
+  }
+
+  try {
+    // Enviar al backend
+    const res = await fetch('http://localhost:3000/api/contacto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, correo, mensaje })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      mostrarAlerta('Error', data.message || 'No se pudo enviar el mensaje.', 'error');
+      return;
+    }
+
+    // Éxito
+    mostrarAlerta('Mensaje Enviado', 'Gracias por contactarnos. Te responderemos pronto.', 'success');
+
+    // Limpiar formulario
+    document.getElementById('nombre').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('mensaje').value = '';
+    
+  } catch (err) {
+    console.error('Error al enviar formulario de contacto:', err);
+    mostrarAlerta('Error', 'No se pudo conectar con el servidor.', 'error');
+  }
+}
