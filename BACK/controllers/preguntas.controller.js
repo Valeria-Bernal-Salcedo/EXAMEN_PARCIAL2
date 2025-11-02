@@ -23,7 +23,7 @@ const startQuiz = (req, res) => {
   console.log("Request body (start):", JSON.stringify(req.body, null, 2));
 
    // Verificar si ya realizó el examen
-  if (usuarioExamen.has(userId)) {
+  if (usuarioExamen.has(userId) && usuarioExamen.get(userId).answered) {
     return res.status(403).json({
       message: "El examen solo se puede aplicar una vez"
     });
