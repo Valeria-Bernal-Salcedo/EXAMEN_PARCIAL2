@@ -19,7 +19,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgb(0, 0, 148);;
+  background: rgb(0, 0, 148);
   color: #fff;
   padding: 0.5rem 1.5rem;
 }
@@ -31,10 +31,35 @@ body {
 }
 
 .nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  color: #fff;
   font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.logo-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.logo-text {
+  line-height: 1;
+}
+
+.nav-link {
   color: #fff;
   text-decoration: none;
-  font-size: 1.2rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background: #444;
 }
 
 .nav-link {
@@ -282,13 +307,13 @@ footer {
 
 .certificaciones-intro h1 {
   font-size: 2.5rem;
-  color: #000;
+  color: #0f45c5;
   margin-bottom: 0.5rem;
 }
 
 .certificaciones-intro h2 {
   font-size: 1.5rem;
-  color: #222;
+  color: #333;
   margin-bottom: 1rem;
 }
 
@@ -296,33 +321,78 @@ footer {
   max-width: 700px;
   margin: 0 auto;
   color: #555;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .certificaciones-list {
   width: 100%;
-  background: #878787;
-  padding: 3rem 1rem;
+  background: #f4f6fb;
+  padding: 4rem 2rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 2.5rem;
   box-sizing: border-box;
 }
 
 .certificacion-card {
   background: linear-gradient(135deg, #0f45c5, #3a6eff);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem 1.5rem;
-  width: 260px;
+  width: 280px;
   color: #fff;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .certificacion-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-10px) scale(1.03); /*Linea que nos permite dar el efecto hover, es decir, que haya un pequeño aumento al pasar el mouse*/
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.certificacion-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.certificacion-card p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #eef1ff;
+  margin-bottom: 1rem;
+}
+
+.certificacion-card ul {
+  list-style: none; /*Linea que elimina los puntos de la lista*/
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.certificacion-card ul li {
+  position: relative; /*Linea que permite posicionar los elementos hijos de la lista*/
+  padding-left: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.certificacion-card ul li::before {
+  content: "✔";
+  position: absolute; /*Linea que permite posicionar el icono antes del texto*/
+  left: 0;
+  color: #a5ff9d;
+  font-size: 1rem;
+}
+
+.certificacion-card p:last-of-type {
+  font-weight: bold;
+  color: #fff;
+  margin-top: 0.5rem;
 }
 
 .contacto-intro {
