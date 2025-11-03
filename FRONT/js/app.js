@@ -74,7 +74,7 @@ function getQueryParam(name) {
 
 // Manejo de alerts
 function mostrarAlerta(titulo, mensaje, tipo) {
-  Swal.fire({
+  return Swal.fire({
     title: titulo,
     text: mensaje,
     icon: tipo,
@@ -303,7 +303,7 @@ async function cargarPreguntas() {
   }
 
   if (!isPaid(CERT_NAME)) {
-    Swal.fire({
+    const result = await Swal.fire({
       title: 'Pago requerido',
       text: 'Debes pagar el examen antes de iniciar.',
       icon: 'warning',
@@ -312,12 +312,17 @@ async function cargarPreguntas() {
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33'
-    }).then(result => {
-      if (result.isConfirmed) {
-        mostrarAlerta('Pagado', 'Pago realizado exitosamente', 'success');
-        setPaid(CERT_NAME, true);
-      }
     });
+    
+    if (!result.isConfirmed) {
+      await mostrarAlerta('Proceso cancelado', 'Debes pagar el examen para poder realizarlo', 'info');
+      window.location.href = 'certificaciones.html';
+      return;
+    }
+
+    // Simular pago exitoso
+    mostrarAlerta('Pagado', 'Pago realizado exitosamente', 'success');
+    setPaid(CERT_NAME, true);
   }
 
   if (btn) { btn.disabled = true; btn.textContent = 'Cargando preguntas...'; }
@@ -374,7 +379,7 @@ async function cargarPreguntas() {
       });
     }
 
-    const currentUser = localStorage.getItem('userName') || localStorage.getItem('nombre') || 'Usuario';
+    const currentUser = localStorage.getItem('nombre') || 'Usuario';
     const descripcion = `Descripción: Examen dinámico de la certificación ${escapeHtml(CERT_NAME)}. Preguntas: ${preguntas.length}. Tiempo estimado: 15 min.`;
     renderExamInfo({ date: new Date(), description: descripcion, userName: currentUser });
 
@@ -428,7 +433,10 @@ async function enviarRespuestas(e) {
     const currentUser = localStorage.getItem('userName') || 'anon';
     const key = `examCompleted_${sanitizeKey(currentUser)}_${sanitizeKey(CERT_NAME)}`;
     localStorage.setItem(key, 'true');
-    mostrarAlerta('¡Examen enviado!', 'Tus respuestas fueron registradas.', 'success');
+    await mostrarAlerta('¡Examen enviado!', 'Tus respuestas fueron registradas.', 'success');
+
+    // Resultado desde el servidor
+    await mostrarAlerta(body.resultado, 'Este es tu resultado de la certificación', 'info');
 
     if (typeof score !== 'undefined' && typeof total !== 'undefined' && total != 0) {
       const avg = (Number(score) / Number(total)) * 100;

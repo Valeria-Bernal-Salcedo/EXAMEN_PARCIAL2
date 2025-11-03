@@ -339,7 +339,7 @@ footer {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem 1.5rem;
   width: 350px;
-  height: 740px;
+  height: auto;
   color: #fff;
   text-align: left;
   transition: all 0.3s ease;
@@ -362,12 +362,20 @@ footer {
   text-align: center;
 }
 
+.certificacion-card .exam-disponible{
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgb(249, 157, 157);
+  margin-bottom: .5rem;
+}
+
 .certificacion-card p {
   font-size: 0.95rem;
   line-height: 1.5;
   color: #eef1ff;
   margin-bottom: .5rem;
 }
+
 
 .certificacion-card ul {
   list-style: none; /*Linea que elimina los puntos de la lista*/
@@ -692,7 +700,7 @@ footer {
 }
 
 /* Botón de iniciar examen */
-#btnCargar {
+#btnCargar, .btn-certificado{
   display: block;
   background: #0020a0;
   color: white;
@@ -706,7 +714,7 @@ footer {
   transition: background 0.3s ease, transform 0.2s;
 }
 
-#btnCargar:hover {
+#btnCargar:hover, .btn-certificado:hover{
   background: #0040ff;
   transform: scale(1.05);
 }
