@@ -3,7 +3,7 @@
 body {
   font-family: 'Poppins', Arial, sans-serif;
   margin: 0;
-  background: #f7f7f7;
+  background: #fff;
   color: #000;
 }
 
@@ -94,9 +94,9 @@ body {
 
 /* ===MAIN GLOBAL=== */
 main {
-  width: 99%;
+  width: 100%;
   margin: 0;
-  padding: 5rem 1rem 4rem;
+  padding: 5rem 1rem 5rem 1rem;
   box-sizing: border-box;
 }
 
@@ -185,7 +185,6 @@ footer {
 
 /* ===PÁGINA PRINCIPAL=== */
 .hero {
-  width: 100%;
   height: 60vh;
   background: #0434cfe9;
   color: white;
@@ -195,7 +194,6 @@ footer {
   align-items: center;     
   text-align: center;
   padding: 2rem;
-  box-sizing: border-box;  
 }
 
 .hero .btn-primary {
@@ -243,8 +241,6 @@ footer {
 
 .caracteristicas,
 .beneficios {
-  width: 100%;
-  box-sizing: border-box;
   padding: 2rem;
   color: white;
 }
@@ -299,7 +295,6 @@ footer {
 }
 
 .certificaciones-intro {
-  width: 99.4%;
   background: #fff;
   text-align: center; 
   padding: 3rem 1rem;
@@ -323,14 +318,13 @@ footer {
 
 .certificaciones-intro p {
   max-width: 700px;
-  /* margin-bottom: 1rem; */
+
   color: #555;
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
 .certificaciones-list {
-  width: 97.5%;
   background: #fff;
   padding: 4rem 2rem;
   display: flex;
@@ -413,14 +407,6 @@ footer {
   cursor: pointer;
 }
 
-/* Pone en negritas la ultima p de cada card */
-/* .certificacion-card p:last-of-type {
-  font-weight: bold;
-  color: #fff;
-  margin-top: 0.5rem;
-} */
-
-
 /* PÁGINA CONTACTO */
 .contacto-intro {
   background: #ffffff;
@@ -496,11 +482,9 @@ footer {
 
 /* PAGINA NOSOTROS */
 .nosotros-intro {
-  /* background: #ffffff; */
+  background: #ffffff;
   text-align: center;
   padding: 4rem 1rem;
-  width: 99vw;
-  box-sizing: border-box;
 }
 
 .nosotros-intro h1 {
@@ -526,9 +510,7 @@ footer {
 .nosotros-mision {
   background: #f7f7f7;
   text-align: center;
-  padding: 3.5rem 1rem;
-  width: 99vw;
-  box-sizing: border-box;
+  padding: 3rem 1rem;
 }
 
 .nosotros-mision h2 {
@@ -545,6 +527,37 @@ footer {
   font-size: 1.05rem;
 }
 
+.nosotros-redes {
+  background: #f7f7f7;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.nosotros-redes h2 {
+  font-size: 2rem;
+  color: #000;
+  margin-bottom: 1rem;
+}
+
+.nosotros-redes p {
+  max-width: 750px;
+  margin: 0 auto;
+  color: #444;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.instagram-icon {
+  font-size: 40px;
+  color: #000;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.instagram-icon:hover {
+  color: #e1306c;        
+  transform: scale(1.2);    
+}
+
 .nosotros-equipo {
   background: #f7f7f7;
   text-align: center;
@@ -558,7 +571,7 @@ footer {
 
 .nosotros-equipo h2 {
   font-size: 2rem;
-  color: #000;
+  color: #0f45c5;
   margin-bottom: 1rem;
 }
 
@@ -573,7 +586,7 @@ footer {
   justify-content: center;
   flex-wrap: wrap;
   gap: 2rem;
-  height: 300px;
+  height: 400px;
 }
 
 .equipo-card {
@@ -696,6 +709,34 @@ footer {
 #btnCargar:hover {
   background: #0040ff;
   transform: scale(1.05);
+}
+
+/* Fecha y descripcion */
+.exam-info {
+  max-width: 900px;
+  margin: 1.25rem auto;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(10,10,10,0.06);
+  background: transparent;
+}
+
+.exam-user {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #0a4aa6;
+}
+
+.exam-date {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #083a9a;
+}
+
+.exam-description {
+  color: #333;
+  font-size: 0.95rem;
 }
 
 /* Botón de enviar respuestas */

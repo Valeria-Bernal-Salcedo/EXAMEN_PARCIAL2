@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
 const API_BASE = 'http://localhost:3000/api/preguntas';
 const AUTH_BASE = 'http://localhost:3000/api/auth';
 let CERT_NAME = 'HTML'; // certificación por defecto (se sobrescribirá desde la URL si aplica)
+const companyLogoUrl= 'http://localhost:3000/public/imagenes/logo.png';
+const instructorSignatureUrl= 'http://localhost:3000/public/imagenes/firmaInstructor.jpg';
+const ceoSignatureUrl= 'http://localhost:3000/public/imagenes/firmaCEO.jpg';
 
 // -------------------- Utilidades --------------------
 function escapeHtml(str) {
@@ -123,6 +126,65 @@ function clearLocalSession() {
     if (prefixes.some(pref => key.startsWith(pref))) { localStorage.removeItem(key); return; }
   });
   try { sessionStorage.clear(); } catch (e) {}
+}
+
+// ----------------- Manejo de fecha y descripción -------------------
+// Crea o devuelve el contenedor #examInfo si no existe (evita ReferenceError)
+function ensureExamInfoContainer() {
+  let examInfo = document.getElementById('examInfo');
+  if (!examInfo) {
+    const btn = document.getElementById('btnCargar');
+    examInfo = document.createElement('div');
+    examInfo.id = 'examInfo';
+    examInfo.className = 'exam-info';
+    examInfo.setAttribute('aria-live', 'polite');
+    examInfo.style.display = 'none'; // oculto hasta que se llene
+
+    const userDiv = document.createElement('div');
+    userDiv.id = 'examUser';
+    userDiv.className = 'exam-user';
+    userDiv.textContent = 'Usuario: —';
+
+    const dateDiv = document.createElement('div');
+    dateDiv.id = 'examDate';
+    dateDiv.className = 'exam-date';
+    dateDiv.textContent = 'Fecha: —';
+
+    const descDiv = document.createElement('div');
+    descDiv.id = 'examDescription';
+    descDiv.className = 'exam-description';
+    descDiv.textContent = 'Descripción: —';
+
+    // Orden: usuario arriba, luego fecha, luego descripción
+    examInfo.appendChild(userDiv);
+    examInfo.appendChild(dateDiv);
+    examInfo.appendChild(descDiv);
+
+    if (btn) btn.insertAdjacentElement('afterend', examInfo);
+    else document.querySelector('main')?.appendChild(examInfo);
+  }
+  return examInfo;
+}
+
+
+function formatoSoloFecha(d = new Date()) {
+  const date = (typeof d === 'string') ? new Date(d) : d;
+  if (isNaN(date)) return 'Fecha: —';
+  const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+  return `Fecha: ${date.toLocaleDateString('es-ES', dateOptions)}`;
+}
+
+function renderExamInfo({ date = new Date(), description = '', userName = '' } = {}) {
+  const examInfo = ensureExamInfoContainer();
+  const userExam = document.getElementById('examUser');
+  const dateExam = document.getElementById('examDate');
+  const descExam = document.getElementById('examDescription');
+
+  const d = (typeof date === 'string') ? new Date(date) : date;
+  if (userExam) userExam.textContent = `Usuario: ${localStorage.getItem('nombre')}`;
+  if (dateExam) dateExam.textContent = formatoSoloFecha(d);
+  if (descExam) descExam.textContent = description || 'Descripción: Este examen evalúa conocimientos de la certificación seleccionada.';
+  examInfo.style.display = 'block';
 }
 
 // -------------------- UI Actualización --------------------
@@ -312,6 +374,10 @@ async function cargarPreguntas() {
       });
     }
 
+    const currentUser = localStorage.getItem('userName') || localStorage.getItem('nombre') || 'Usuario';
+    const descripcion = `Descripción: Examen dinámico de la certificación ${escapeHtml(CERT_NAME)}. Preguntas: ${preguntas.length}. Tiempo estimado: 15 min.`;
+    renderExamInfo({ date: new Date(), description: descripcion, userName: currentUser });
+
     const sbtn = submitBtn();
     if (sbtn) { sbtn.disabled = false; sbtn.textContent = 'Enviar respuestas'; }
     if (btn) { btn.textContent = 'Preguntas cargadas'; btn.disabled = true; }
@@ -403,7 +469,11 @@ async function enviarRespuestas(e) {
               cert: CERT_NAME,
               score,
               total,
-              nombre: userName
+              nombre: userName,
+              companyName: 'SkillByte',              // opcional
+              companyLogoUrl: companyLogoUrl,        // las constantes definidas arriba
+              instructorSignatureUrl: instructorSignatureUrl,
+              ceoSignatureUrl: ceoSignatureUrl
             })
           });
 

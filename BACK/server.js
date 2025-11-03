@@ -5,6 +5,8 @@ const contactoRoutes = require("./routes/contacto.routes");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const path = require('path');
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Middlewares mínimos
 app.use(express.json());
