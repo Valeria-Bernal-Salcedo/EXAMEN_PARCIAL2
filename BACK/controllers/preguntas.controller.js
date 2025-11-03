@@ -92,9 +92,16 @@ const submitAnswers = (req, res) => {
 
   // Marcar examen como respondido
   examData.answered = true;
+  let resultado;
+  if(score<7){
+    resultado = "Reprobado";  
+  }else{
+    resultado = "Aprobado";
+  }
 
   const responseBody = {
     message: "Respuestas evaluadas.",
+    resultado,
     score,
     total: examData.questions.length,
     details
@@ -105,7 +112,6 @@ const submitAnswers = (req, res) => {
 
   return res.status(200).json(responseBody);
 };
-
 
 async function generarCertificado(req, res) {
   const userId = req.userId;
