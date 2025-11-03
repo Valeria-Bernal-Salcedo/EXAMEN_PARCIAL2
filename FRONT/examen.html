@@ -34,6 +34,11 @@
 
     <main>
         <button id="btnCargar">Iniciar examen</button>
+        <div id="examInfo" class="exam-info" aria-live="polite" style="display:none;">
+            <div id="examUser" class="exam-user">Usuario: —</div>
+            <div id="examDate" class="exam-date">Fecha: —</div>
+            <div id="examDescription" class="exam-description">Descripción: —</div>
+        </div>
         <div id="questionsContainer"></div>
         <button type="submit" id="submitAnswers" disabled>Enviar respuestas</button>
         <div id="resultContainer"></div>
