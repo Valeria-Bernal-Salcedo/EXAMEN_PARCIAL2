@@ -118,7 +118,7 @@ async function generarCertificado(req, res) {
   let { cert, score, total, nombre } = req.body;
 
   const companyName = req.body.companyName || 'SkillByte';
-  const companyLogoUrl = req.body.companyLogoUrl || ''; // URL pública o ruta servida por backend
+  const companyLogoUrl = req.body.companyLogoUrl || ''; 
   const instructorSignatureUrl = req.body.instructorSignatureUrl || '';
   const ceoSignatureUrl = req.body.ceoSignatureUrl || '';
 
@@ -126,7 +126,7 @@ async function generarCertificado(req, res) {
   const CEO_NAME = 'Valeria Bernal Salcedo';
 
   nombre = typeof nombre === 'string' ? nombre : String(nombre || 'Usuario');
-  score = Number(score) || 0;
+  score = Number(score) || 0;   // Verifica que sean numeros, si es cadena ("8") lo pasa a numero (8), pero si es como tal cadena (hola) deja el valor en 0
   total = Number(total) || 0;
 
   // Requisito para obtener certificado
@@ -137,7 +137,7 @@ async function generarCertificado(req, res) {
 
   // --- Helpers para imágenes ---
   async function fetchImageBuffer(url) {
-    if (!url) return null;
+    if (!url) return null;  
     try {
       const resp = await fetch(url, { method: 'GET' });
       if (!resp.ok) {
@@ -165,11 +165,32 @@ async function generarCertificado(req, res) {
   const instructorBufFromBase64 = bufferFromBase64DataUrl(req.body.instructorSignatureBase64);
   const ceoBufFromBase64 = bufferFromBase64DataUrl(req.body.ceoSignatureBase64);
 
-  const [logoBuf, instructorSigBuf, ceoSigBuf] = await Promise.all([
-    logoBufFromBase64 || fetchImageBuffer(companyLogoUrl),
-    instructorBufFromBase64 || fetchImageBuffer(instructorSignatureUrl),
-    ceoBufFromBase64 || fetchImageBuffer(ceoSignatureUrl)
-  ]);
+  
+  let logoTask;
+  if (logoBufFromBase64) {
+    // ya tenemos el Buffer, envolver en promesa resuelta para mantener la misma interfaz
+    logoTask = Promise.resolve(logoBufFromBase64);
+  } else {
+    logoTask = fetchImageBuffer(companyLogoUrl);
+  }
+
+  let instructorTask;
+  if (instructorBufFromBase64) {
+    instructorTask = Promise.resolve(instructorBufFromBase64);
+  } else {
+    instructorTask = fetchImageBuffer(instructorSignatureUrl);
+  }
+
+  let ceoTask;
+  if (ceoBufFromBase64) {
+    ceoTask = Promise.resolve(ceoBufFromBase64);
+  } else {
+    ceoTask = fetchImageBuffer(ceoSignatureUrl);
+  }  
+
+  const logoBuf = await logoTask;
+  const instructorSigBuf = await instructorTask;
+  const ceoSigBuf = await ceoTask;
 
   // --- Crear PDF ---
   const doc = new PDFDocument({ size: 'A4', margin: 50 });
@@ -179,24 +200,6 @@ async function generarCertificado(req, res) {
   doc.pipe(res);
 
   const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-
-  // --- Opcional: marca de agua tenue usando el logo (si existe) ---
-  if (logoBuf) {
-    try {
-      doc.save();
-      doc.opacity(0.08);
-      // Centrar la marca de agua y escalar
-      const wmW = 350;
-      const wmX = doc.page.margins.left + (pageWidth - wmW) / 2;
-      const wmY = 140;
-      doc.image(logoBuf, wmX, wmY, { width: wmW });
-      doc.opacity(1);
-      doc.restore();
-    } catch (err) {
-      console.warn('No se pudo pintar marca de agua:', err && err.message);
-      // continuar sin marca
-    }
-  }
 
   // --- Header: logo a la izquierda y companyName a la derecha ---
   if (logoBuf) {
@@ -208,30 +211,43 @@ async function generarCertificado(req, res) {
   }
 
   doc.font('Helvetica-Bold').fontSize(11);
-  doc.text(companyName, doc.page.margins.left + (logoBuf ? 110 : 0), 62, {
-    width: pageWidth - (logoBuf ? 110 : 0),
+  doc.text(companyName, doc.page.margins.left, 70, {
+    width: pageWidth,
     align: 'right'
   });
 
   // --- Título principal ---
-  doc.moveDown(4);
-  doc.font('Helvetica-Bold').fontSize(28).fillColor('#0b3b93').text('CERTIFICADO DE APROBACIÓN', {
+  doc.moveDown(5);
+  doc.font('Helvetica-Bold').fontSize(28).fillColor('#0b3b93').text('CERTIFICADO DE APROBACIÓN', doc.page.margins.left, null, {
+    width: pageWidth,
     align: 'center'
   });
 
   // --- Subtitulo y destinatario ---
   doc.moveDown(1.6);
-  doc.font('Helvetica').fontSize(12).fillColor('#000').text('Otorgado a:', { align: 'center' });
+  doc.font('Helvetica').fontSize(12).fillColor('#000').text('Otorgado a:', doc.page.margins.left, null, {
+    width: pageWidth,
+    align: 'center'
+  });
   doc.moveDown(0.3);
-  doc.font('Helvetica-Bold').fontSize(22).text(nombre, { align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(22).text(nombre, doc.page.margins.left, null, {
+    width: pageWidth,
+    align: 'center'
+  });
 
   // --- Certificación y puntaje ---
   doc.moveDown(0.9);
   if (cert) {
-    doc.font('Helvetica').fontSize(13).text(`Por haber aprobado la certificación: ${cert}`, { align: 'center' });
+    doc.font('Helvetica').fontSize(13).text(`Por haber aprobado la certificación: ${cert}`, doc.page.margins.left, null, {
+      width: pageWidth,
+      align: 'center'
+    });
   }
   doc.moveDown(0.4);
-  doc.font('Helvetica').fontSize(12).text(`Puntaje obtenido: ${score}/${total}`, { align: 'center' });
+  doc.font('Helvetica').fontSize(12).text(`Puntaje obtenido: ${score}/${total}`, doc.page.margins.left, null, {
+    width: pageWidth,
+    align: 'center'
+  });
 
   // --- Ciudad y fecha ---
   const today = new Date();
@@ -239,15 +255,20 @@ async function generarCertificado(req, res) {
   const fechaFormateada = today.toLocaleDateString('es-ES', dateOptions);
   const ciudad = 'Aguascalientes, Aguascalientes';
   doc.moveDown(0.9);
-  doc.font('Helvetica').fontSize(11).text(`${ciudad} — Fecha: ${fechaFormateada}`, { align: 'center' });
+  doc.font('Helvetica').fontSize(11).text(`${ciudad} — Fecha: ${fechaFormateada}`, doc.page.margins.left, null, {
+    width: pageWidth,
+    align: 'center'
+  });
 
   // --- Mensaje descriptivo ---
   doc.moveDown(1.2);
   doc.font('Helvetica').fontSize(11).fillColor('#222').text(
     'Por haber demostrado los conocimientos y habilidades requeridas en la evaluación correspondiente.',
+    doc.page.margins.left,
+    null,
     {
       align: 'center',
-      width: pageWidth * 0.75,
+      width: pageWidth,
       lineGap: 4
     }
   );
@@ -274,6 +295,7 @@ async function generarCertificado(req, res) {
       console.warn('Error dibujando firma instructor:', e && e.message);
     }
   }
+  
   // Nombre y cargo instructor
   doc.font('Helvetica-Bold').fontSize(11).fillColor('#000').text(INSTRUCTOR_NAME, leftX, footerY + 48, {
     width: colWidth,
@@ -290,12 +312,13 @@ async function generarCertificado(req, res) {
       console.warn('Error dibujando firma CEO:', e && e.message);
     }
   }
+
   // Nombre y cargo CEO
   doc.font('Helvetica-Bold').fontSize(11).text(CEO_NAME, rightX, footerY + 48, {
     width: colWidth,
     align: 'center'
   });
-  doc.font('Helvetica').fontSize(10).text('CEO', rightX, footerY + 64, { width: colWidth, align: 'center' });
+  doc.font('Helvetica').fontSize(10).text('CEO', rightX, footerY + 64, { width: colWidth, align: 'center' });   
 
   // --- Footer pequeño (opcional: repetir empresa) ---
   doc.moveTo(0, doc.page.height - doc.page.margins.bottom - 8); // no visible, solo para posicion
