@@ -14,6 +14,8 @@ app.use(express.json());
 const ALLOWED_ORIGINS = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
+  'http://10.13.151.119:5500',
+  'http://10.13.160.200:5500'
 ];
 
 app.use(cors({ 
