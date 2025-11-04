@@ -19,7 +19,7 @@ function preguntasAleatorias(preguntas, N){
 
 // Inciar examen
 const startQuiz = (req, res) => {
-  const name = req.body && req.body.name ? req.body.name : "PONER OTRO NOMBRE";
+  const name = req.body && req.body.name ? req.body.name : "SkillByte";
   const userId = req.userId;
   console.log(`Acceso al /api/preguntas/start  ${name}`);
   console.log("Request body (start):", JSON.stringify(req.body, null, 2));
@@ -56,7 +56,7 @@ const startQuiz = (req, res) => {
 
 // Recibir y evaluar respuestas
 const submitAnswers = (req, res) => {
-  const name = req.body && req.body.name ? req.body.name : "PONER OTRO NOMBRE";
+  const name = req.body && req.body.name ? req.body.name : "SkillByte";
   const userId = req.userId;
   const examData = usuarioExamen.get(userId);
 
