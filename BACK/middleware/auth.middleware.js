@@ -3,10 +3,6 @@
 // Estructura: { token: userId }
 const sessions = new Map();
 
-/**
- * Middleware para verificar el token de sesión
- * Espera el token en el header: Authorization: Bearer <token>
- */
 exports.verifyToken = (req, res, next) => {
   // Obtener el header Authorization
   const authHeader = req.headers.authorization;
@@ -39,11 +35,6 @@ exports.verifyToken = (req, res, next) => {
   next();
 };
 
-/**
- * Función para crear una nueva sesión
- * @param {string} userId - ID del usuario
- * @returns {string} token - Token generado
- */
 exports.createSession = (userId) => {
   const crypto = require('crypto');
   // Usar crypto.randomUUID cuando esté disponible (Node 14.17+).
@@ -55,26 +46,14 @@ exports.createSession = (userId) => {
   return token;
 };
  
-/**
- * Función para eliminar una sesión (logout)
- * @param {string} token - Token de la sesión a eliminar
- * @returns {boolean} - True si se eliminó, false si no existía
- */
 exports.deleteSession = (token) => {
   return sessions.delete(token);
 };
 
-/**
- * Función para obtener todas las sesiones activas (útil para debugging)
- * @returns {number} - Número de sesiones activas
- */
 exports.getActiveSessions = () => {
   return sessions.size;
 };
 
-/**
- * Función para limpiar todas las sesiones (útil para mantenimiento)
- */
 exports.clearAllSessions = () => {
   sessions.clear();
 };
